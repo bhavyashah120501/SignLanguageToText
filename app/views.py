@@ -12,7 +12,7 @@ from rest_framework import status
 import tensorflow as tf
 import cv2
 # Create your views here.
-model = tf.keras.models.load_model(r"C:\Users\Shubham Thakar\Downloads\my_model.h5")
+model = tf.keras.models.load_model(r"C:\Users\DELL\Documents\GitHub\SignLanguageToText\app\my_model (2).h5")
 classes = ['Q',
 'del',
 'V',
@@ -43,6 +43,11 @@ classes = ['Q',
 'G',
 'X']
 
+y=0
+x=0
+h=300
+w=300
+
 def img_class(model, img):
     img_arr = np.asarray(img)
     
@@ -56,7 +61,20 @@ def AslToText(request):
         char_op=""
         b = request.data['text']
         im = Image.open(BytesIO(base64.b64decode(b)))
-        temp_img =  cv2.cvtColor(np.asarray(im), cv2.COLOR_RGB2BGR)
+        left =35
+        top = 35
+        right = 175
+        bottom = 175
+        width, height = im.size
+
+        # Cropped image of above dimension
+        # (It will not change orginal image)
+        im = im.transpose(Image.ROTATE_180)
+        im1 = im.crop((0, 0, width, height/2))
+        temp_img2 = cv2.rotate(np.array(im1), cv2.ROTATE_90_COUNTERCLOCKWISE)
+        temp_img =  cv2.cvtColor(np.asarray(temp_img2), cv2.COLOR_RGB2BGR)
+        # crop = temp_img[y:y+h,x:x+w]
+
         temp_img = cv2.resize(temp_img, (64,64))
         images=[]
         images.append(temp_img)
@@ -93,6 +111,3 @@ def textToAsl(request):
                 data[count] = nesteddata     #main dict
                 count += 1
         print(json.dumps(data))          #conv to json
-
-
-
